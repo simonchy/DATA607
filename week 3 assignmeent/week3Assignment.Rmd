@@ -1,0 +1,137 @@
+---
+title: "Week 3 Assignment"
+author: "MD SIMON CHOWDHURY"
+date: "2024-09-21"
+output: html_document
+---
+
+## 1. Normalization in R
+
+Normalization is the process of organizing data to minimize redundancy. In this section, we demonstrate normalization by splitting a single dataframe into three related dataframes.
+
+```{r}
+# Original Data
+student_data <- data.frame(
+  student_id = c(1, 2, 3),
+  student_name = c("Alice", "Bob", "Charlie"),
+  course = c("Math", "Science", "Math"),
+  instructor = c("Dr. Smith", "Dr. Jones", "Dr. Smith")
+)
+
+student_data
+
+# Normalized Data
+
+# Students Table
+students <- data.frame(
+  student_id = c(1, 2, 3),
+  student_name = c("Alice", "Bob", "Charlie")
+)
+
+students
+
+# Courses Table
+courses <- data.frame(
+  course_id = c(1, 2),
+  course_name = c("Math", "Science"),
+  instructor = c("Dr. Smith", "Dr. Jones")
+)
+
+courses
+
+# Enrollments Table
+enrollments <- data.frame(
+  student_id = c(1, 2, 3),
+  course_id = c(1, 2, 1)
+)
+
+enrollments
+```
+## 2. Character Manipulation
+Using the College Majors dataset from FiveThirtyEight, we identify the majors that contain either "DATA" or "STATISTICS."
+
+```{r}
+library(dplyr)
+
+# Load data from URL
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv"
+majors <- read.csv(url)
+
+# Filter majors that contain "DATA" or "STATISTICS"
+selected_majors <- majors %>%
+  filter(grepl("DATA|STATISTICS", Major, ignore.case = TRUE))
+
+selected_majors
+
+```
+
+## 3. Regular Expressions Descriptions
+Below are explanations of what the following regular expressions will match:
+
+1. (.)\1\1: This matches any character repeated three times consecutively, such as "aaa" or "111".
+   example:
+```{r}
+example1 <- c("aaa", "bbb", "111", "abc")
+grepl("(.)\\1\\1", example1)
+
+```
+
+
+2. "(.)(.)\2\1": This matches a four-character string where the first two characters are mirrored by the       last two, like "abba".
+   example:
+```{r}
+example2 <- c("abba", "12321", "abcd")
+grepl("(.)(.)\\2\\1", example2)
+
+```
+
+3. (..)\1: This matches any two-character sequence that repeats, like "abab" or "1212".
+   example:
+```{r}
+example3 <- c("abab", "1212", "abcd")
+grepl("(..)\\1", example3)
+
+```
+
+4. "(.).\1.\1": This matches a five-character string where the first, third, and fifth characters are the      same, like "ababa" or "x2x2x".
+   example:
+```{r}
+example4 <- c("ababa", "x2x2x", "abcde")
+grepl("(.).\\1.\\1", example4)
+
+```
+
+5. "(.)(.)(.).*\3\2\1": This matches any string where the first three characters are repeated in reverse       order somewhere later in the string, like "abc123cba".
+   example:
+```{r}
+example5 <- c("abc123cba", "xyz321zyx", "abcdef")
+grepl("(.)(.)(.).*\\3\\2\\1", example5)
+
+```
+
+## 4. Constructing Regular Expressions with Examples
+Here are the regular expressions constructed to match specific patterns, along with examples:
+
+1.Start and end with the same character:
+```{r}
+pattern1 <- "^(.).*\1$"
+example6 <- c("level", "radar", "test", "abba")
+grepl(pattern1, example6)
+
+```
+
+2.Contain a repeated pair of letters: 
+```{r}
+pattern2 <- "(..).*\\1"
+example7 <- c("church", "abab", "banana", "test")
+grepl(pattern2, example7)
+
+```
+
+3.Contain one letter repeated in at least three places:
+```{r}
+pattern3 <- "(.).*\\1.*\\1"
+example8 <- c("eleven", "banana", "abracadabra", "test")
+grepl(pattern3, example8)
+
+```
