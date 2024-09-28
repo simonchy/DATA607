@@ -1,0 +1,85 @@
+---
+title: "Airline Arrival Delays: Tidying and Analysis"
+author: "MD SIMON CHOWDHURY"
+date: "2024-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Introduction
+In this analysis, we examine arrival delays for two airlines across five destinations. The data comes from a CSV file, which is initially in a wide format, showing delays for each airline separately across the destinations. Our goal is to tidy this data, transform it into a format suitable for analysis, and then compare the arrival delays between the two airlines.
+
+## Loading the Data
+First, we load the data set from the CSV file.
+
+```{r}
+# Load the data from the CSV file
+arrival_delays <- read.csv("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/week%204/airline_arrivals.csv")
+
+
+# Display the first few rows of the data
+head(arrival_delays)
+
+# View the structure of the data
+str(arrival_delays)
+
+# Summarize the data to get an idea of its distribution
+summary(arrival_delays)
+
+
+```
+
+## Tidying the Data
+The dataset is currently in a "wide" format, with each destination represented as a row, and separate columns for each airline's delays. We'll tidy this data by converting it into a "long" format, where each row contains a destination, airline, and the corresponding delay.
+
+```{r}
+# First, inspect the structure of the data
+str(arrival_delays)
+
+# Convert all city columns to numeric, replacing non-numeric values with NA
+arrival_delays <- arrival_delays %>%
+  mutate_at(vars(Los.Angeles, Phoenix, San.Diego, San.Francisco, Seattle), as.numeric)
+
+# Now pivot the data into long format
+tidy_delays <- arrival_delays %>%
+  pivot_longer(cols = c("Los.Angeles", "Phoenix", "San.Diego", "San.Francisco", "Seattle"),
+               names_to = "City", values_to = "Flights")
+
+# View the tidied dataset
+head(tidy_delays)
+```
+
+## Analysis: Comparing Arrival Delays
+With the data now tidied, we can begin comparing the average arrival delays for the two airlines across all destinations. This will give us insights into which airline tends to have longer or shorter delays.
+
+## Summary of On-Time vs Delayed Flights
+```{r}
+# Plot the count of on-time and delayed flights for each airline
+ggplot(tidy_delays, aes(x = Airline, y = Flights, fill = Status)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "On-Time vs Delayed Flights by Airline",
+       x = "Airline", y = "Number of Flights") +
+  theme_minimal()
+```
+
+## Delays by City
+```{r}
+# Plot the delays across cities
+ggplot(tidy_delays %>% filter(Status == "delayed"), 
+       aes(x = City, y = Flights, fill = Airline)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Flight Delays Across Cities",
+       x = "City", y = "Number of Delayed Flights") +
+  theme_minimal() +
+  coord_flip()
+
+```
+
+## Conclusion
+The analysis shows clear differences in arrival delays between the two airlines. By tidying the data and transforming it into a long format, we were able to easily compare the performance of each airline across various destinations. These findings could help further studies or improve operational efficiency by identifying problem areas for certain airlines.
