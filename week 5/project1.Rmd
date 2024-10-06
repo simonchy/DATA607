@@ -1,0 +1,147 @@
+---
+title: "Project 1"
+author: "MD SIMON CHOWDHURY"
+date: "2024-10-04"
+output: html_document
+---
+
+## Introduction
+
+This R Markdown file processes a text file containing chess tournament results. It extracts the following information for each player:
+
+- Player’s Name
+- Player’s State
+- Total Number of Points
+- Player’s Pre-Tournament Rating
+- Average Pre-Tournament Rating of Opponents
+
+The final output is saved as a CSV file, which can be used for further analysis or imported into a SQL database.
+
+```{r setup, include=FALSE}
+# Load libraries
+library(dplyr)
+```
+
+## Loading the Data
+Load the chess tournament data from a text file using the readLines() function, which loads each line as a string into R.
+
+```{r}
+# Read file into R
+raw_data <- readLines("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/week%205/tournamentinfo.txt")
+```
+
+## Identifying Player Entries
+The text file is structured such that each player's data starts with a line that includes the player's number and name. We can identify these lines using grep() and store the line indices.
+
+```{r}
+# Extract player entries 
+player_entries <- grep("^\\s*\\d+\\s*\\|", raw_data)
+```
+
+## Creating an Empty Data Frame
+The data frame will have the following columns:
+
+Name: The player's name
+State: The player's state or region
+TotalPoints: The total number of points the player earned in the tournament
+PreRating: The player's rating before the tournament
+AvgOpponentRating: The average pre-tournament rating of the player's opponents
+
+```{r}
+# Create an empty dataframe for saving results
+chess_data <- data.frame(
+  Name = character(),
+  State = character(),
+  TotalPoints = numeric(),
+  PreRating = numeric(),
+  AvgOpponentRating = numeric(),
+  stringsAsFactors = FALSE
+)
+```
+
+## Function to Calculate Average Opponent Rating
+
+1. Extracting opponent IDs from the rounds.
+2. Looking up the opponent's rating by searching for their ID in the dataset.
+3. Returning the average rating of the opponents.
+
+```{r}
+get_opponent_ratings <- function(player_info, raw_data) {
+  # Extract opponent IDs from rounds
+  rounds <- player_info[grepl("(W|L|D)\\s*(\\d+)", player_info)]
+  opponent_ids <- as.numeric(sub(".*[WLD]\\s*(\\d+).*", "\\1", rounds))
+
+  # Initialize an empty vector to store opponent ratings
+  opponent_ratings <- numeric()
+
+  # Loop through opponent IDs to find their ratings
+  for (id in opponent_ids) {
+    # Search for the opponent's line by their ID
+    opponent_line <- raw_data[grep(paste0("^\\s*", id, "\\s*\\|"), raw_data)]
+
+    if (length(opponent_line) > 0) {
+      pattern <- "\\|\\s*(\\d+\\.\\d+)\\s*\\|"
+      matches <- regmatches(opponent_line, regexpr(pattern, opponent_line, perl = TRUE))
+      
+      opponent_rating <- sub(pattern, "\\1", matches)
+      
+      # Convert to numeric
+      opponent_rating_num <- as.numeric(opponent_rating)
+      
+      # Check if the conversion succeeded
+      if (!is.na(opponent_rating_num)) {
+        opponent_ratings <- c(opponent_ratings, opponent_rating_num)
+      }
+    }
+  }
+
+  # Return the average rating of opponents, or NA if no valid ratings found
+  if (length(opponent_ratings) > 0) {
+    return(mean(opponent_ratings, na.rm = TRUE))
+  } else {
+    return(NA)  # Return NA if no valid ratings were found
+  }
+}
+
+```
+
+## Extracting Information for Each Player
+
+Looping over each player's entry in the data, extract relevant details (name, state, pre-rating, etc.), and compute the average opponent rating using the function defined above. The data is then stored in the data frame.
+
+```{r}
+# Iterate over each player and extract relevant info
+for (i in seq_along(player_entries)) {
+  # Extract lines of the player's entry
+  player_info <- raw_data[player_entries[i]:(player_entries[i]+2)]
+  
+  # Extract player name
+  player_name <- sub("^\\s*\\d+\\s*\\|\\s*(.*?)\\s*\\|.*", "\\1", player_info[1])
+  
+  # Extract state and pre-rating
+  player_state <- sub("^.*\\s([A-Z]{2})\\s.*", "\\1", player_info[2])
+  pre_rating <- as.numeric(sub(".*R:\\s*(\\d+).*", "\\1", player_info[2]))
+  
+  # Extract total points
+  total_points <- as.numeric(sub("^.*\\|\\s*(\\d+\\.\\d+).*", "\\1", player_info[1]))
+  
+  # Calculate the average rating of opponents
+  avg_opponent_rating <- get_opponent_ratings( player_info, raw_data)
+  
+  # Append the player's data to the dataframe
+  chess_data <- chess_data %>%
+    add_row(Name = player_name, State = player_state, TotalPoints = total_points, PreRating = pre_rating, AvgOpponentRating = avg_opponent_rating)
+}
+```
+
+## Exporting the Data to a CSV File
+
+```{r}
+# Output the dataframe as a CSV file
+write.csv(chess_data, "chess_tournament_results.csv", row.names = FALSE)
+
+```
+
+## Conclusion
+
+This output can be useful for evaluating player performance or further analysis in data science projects.
