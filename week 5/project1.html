@@ -387,24 +387,6 @@ lines using grep() and store the line indices.</p>
 <pre class="r"><code># Extract player entries 
 player_entries &lt;- grep(&quot;^\\s*\\d+\\s*\\|&quot;, raw_data)</code></pre>
 </div>
-<div id="creating-an-empty-data-frame" class="section level2">
-<h2>Creating an Empty Data Frame</h2>
-<p>The data frame will have the following columns:</p>
-<p>Name: The player’s name State: The player’s state or region
-TotalPoints: The total number of points the player earned in the
-tournament PreRating: The player’s rating before the tournament
-AvgOpponentRating: The average pre-tournament rating of the player’s
-opponents</p>
-<pre class="r"><code># Create an empty dataframe for saving results
-chess_data &lt;- data.frame(
-  Name = character(),
-  State = character(),
-  TotalPoints = numeric(),
-  PreRating = numeric(),
-  AvgOpponentRating = numeric(),
-  stringsAsFactors = FALSE
-)</code></pre>
-</div>
 <div id="function-to-calculate-average-opponent-rating" class="section level2">
 <h2>Function to Calculate Average Opponent Rating</h2>
 <ol style="list-style-type: decimal">
@@ -456,28 +438,32 @@ dataset.</li>
 details (name, state, pre-rating, etc.), and compute the average
 opponent rating using the function defined above. The data is then
 stored in the data frame.</p>
-<pre class="r"><code># Iterate over each player and extract relevant info
-for (i in seq_along(player_entries)) {
-  # Extract lines of the player&#39;s entry
-  player_info &lt;- raw_data[player_entries[i]:(player_entries[i]+2)]
-  
-  # Extract player name
-  player_name &lt;- sub(&quot;^\\s*\\d+\\s*\\|\\s*(.*?)\\s*\\|.*&quot;, &quot;\\1&quot;, player_info[1])
-  
-  # Extract state and pre-rating
-  player_state &lt;- sub(&quot;^.*\\s([A-Z]{2})\\s.*&quot;, &quot;\\1&quot;, player_info[2])
-  pre_rating &lt;- as.numeric(sub(&quot;.*R:\\s*(\\d+).*&quot;, &quot;\\1&quot;, player_info[2]))
-  
-  # Extract total points
-  total_points &lt;- as.numeric(sub(&quot;^.*\\|\\s*(\\d+\\.\\d+).*&quot;, &quot;\\1&quot;, player_info[1]))
-  
-  # Calculate the average rating of opponents
-  avg_opponent_rating &lt;- get_opponent_ratings( player_info, raw_data)
-  
-  # Append the player&#39;s data to the dataframe
-  chess_data &lt;- chess_data %&gt;%
-    add_row(Name = player_name, State = player_state, TotalPoints = total_points, PreRating = pre_rating, AvgOpponentRating = avg_opponent_rating)
-}</code></pre>
+<pre class="r"><code># Extract lines of player entries
+player_info &lt;- lapply(seq_along(player_entries), function(i) raw_data[player_entries[i]:(player_entries[i]+2)])
+
+# Extract player names
+player_names &lt;- sapply(player_info, function(info) sub(&quot;^\\s*\\d+\\s*\\|\\s*(.*?)\\s*\\|.*&quot;, &quot;\\1&quot;, info[1]))
+
+# Extract states
+player_states &lt;- sapply(player_info, function(info) sub(&quot;^.*\\s([A-Z]{2})\\s.*&quot;, &quot;\\1&quot;, info[2]))
+
+# Extract pre-ratings
+pre_ratings &lt;- sapply(player_info, function(info) as.numeric(sub(&quot;.*R:\\s*(\\d+).*&quot;, &quot;\\1&quot;, info[2])))
+
+# Extract total points
+total_points &lt;- sapply(player_info, function(info) as.numeric(sub(&quot;^.*\\|\\s*(\\d+\\.\\d+).*&quot;, &quot;\\1&quot;, info[1])))
+
+# Calculate average opponent ratings
+avg_opponent_ratings &lt;- sapply(player_info, function(info) get_opponent_ratings(info, raw_data))
+
+# Create a data frame using the extracted data
+chess_data &lt;- data.frame(
+  Name = player_names,
+  State = player_states,
+  TotalPoints = total_points,
+  PreRating = pre_ratings,
+  AvgOpponentRating = avg_opponent_ratings
+)</code></pre>
 </div>
 <div id="exporting-the-data-to-a-csv-file" class="section level2">
 <h2>Exporting the Data to a CSV File</h2>
@@ -486,6 +472,477 @@ write.csv(chess_data, &quot;chess_tournament_results.csv&quot;, row.names = FALS
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
+<pre class="r"><code># Display the table of results
+kable(chess_data, caption = &quot;Chess Tournament Results&quot;)</code></pre>
+<table>
+<caption>Chess Tournament Results</caption>
+<colgroup>
+<col width="36%" />
+<col width="8%" />
+<col width="16%" />
+<col width="13%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">State</th>
+<th align="right">TotalPoints</th>
+<th align="right">PreRating</th>
+<th align="right">AvgOpponentRating</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">GARY HUA</td>
+<td align="left">ON</td>
+<td align="right">6.0</td>
+<td align="right">1794</td>
+<td align="right">5.5</td>
+</tr>
+<tr class="even">
+<td align="left">DAKSHESH DARURI</td>
+<td align="left">MI</td>
+<td align="right">6.0</td>
+<td align="right">1553</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ADITYA BAJAJ</td>
+<td align="left">MI</td>
+<td align="right">6.0</td>
+<td align="right">1384</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="even">
+<td align="left">PATRICK H SCHILLING</td>
+<td align="left">MI</td>
+<td align="right">5.5</td>
+<td align="right">1716</td>
+<td align="right">6.0</td>
+</tr>
+<tr class="odd">
+<td align="left">HANSHI ZUO</td>
+<td align="left">MI</td>
+<td align="right">5.5</td>
+<td align="right">1655</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">HANSEN SONG</td>
+<td align="left">OH</td>
+<td align="right">5.0</td>
+<td align="right">1686</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">GARY DEE SWATHELL</td>
+<td align="left">MI</td>
+<td align="right">5.0</td>
+<td align="right">1649</td>
+<td align="right">6.0</td>
+</tr>
+<tr class="even">
+<td align="left">EZEKIEL HOUGHTON</td>
+<td align="left">MI</td>
+<td align="right">5.0</td>
+<td align="right">1641</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">STEFANO LEE</td>
+<td align="left">ON</td>
+<td align="right">5.0</td>
+<td align="right">1411</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">ANVIT RAO</td>
+<td align="left">MI</td>
+<td align="right">5.0</td>
+<td align="right">1365</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">CAMERON WILLIAM MC LEMAN</td>
+<td align="left">MI</td>
+<td align="right">4.5</td>
+<td align="right">1712</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="even">
+<td align="left">KENNETH J TACK</td>
+<td align="left">MI</td>
+<td align="right">4.5</td>
+<td align="right">1663</td>
+<td align="right">6.0</td>
+</tr>
+<tr class="odd">
+<td align="left">TORRANCE HENRY JR</td>
+<td align="left">MI</td>
+<td align="right">4.5</td>
+<td align="right">1666</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="even">
+<td align="left">BRADLEY SHAW</td>
+<td align="left">MI</td>
+<td align="right">4.5</td>
+<td align="right">1610</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">ZACHARY JAMES HOUGHTON</td>
+<td align="left">MI</td>
+<td align="right">4.5</td>
+<td align="right">1220</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="even">
+<td align="left">MIKE NIKITIN</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1604</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">RONALD GRZEGORCZYK</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1629</td>
+<td align="right">5.5</td>
+</tr>
+<tr class="even">
+<td align="left">DAVID SUNDEEN</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1600</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="odd">
+<td align="left">DIPANKAR ROY</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1564</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="even">
+<td align="left">JASON ZHENG</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1595</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="odd">
+<td align="left">DINH DANG BUI</td>
+<td align="left">ON</td>
+<td align="right">4.0</td>
+<td align="right">1563</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="even">
+<td align="left">EUGENE L MCCLURE</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1555</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ALAN BUI</td>
+<td align="left">ON</td>
+<td align="right">4.0</td>
+<td align="right">1363</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="even">
+<td align="left">MICHAEL R ALDRICH</td>
+<td align="left">MI</td>
+<td align="right">4.0</td>
+<td align="right">1229</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="odd">
+<td align="left">LOREN SCHWIEBERT</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1745</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="even">
+<td align="left">MAX ZHU</td>
+<td align="left">ON</td>
+<td align="right">3.5</td>
+<td align="right">1579</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="odd">
+<td align="left">GAURAV GIDWANI</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1552</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="even">
+<td align="left">SOFIA ADINA STANESCU-BELLU</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1507</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">CHIEDOZIE OKORIE</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1602</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="even">
+<td align="left">GEORGE AVERY JONES</td>
+<td align="left">ON</td>
+<td align="right">3.5</td>
+<td align="right">1522</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="odd">
+<td align="left">RISHI SHETTY</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1494</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="even">
+<td align="left">JOSHUA PHILIP MATHEWS</td>
+<td align="left">ON</td>
+<td align="right">3.5</td>
+<td align="right">1441</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="odd">
+<td align="left">JADE GE</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1449</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="even">
+<td align="left">MICHAEL JEFFERY THOMAS</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1399</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="odd">
+<td align="left">JOSHUA DAVID LEE</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1438</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="even">
+<td align="left">SIDDHARTH JHA</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">1355</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">AMIYATOSH PWNANANDAM</td>
+<td align="left">MI</td>
+<td align="right">3.5</td>
+<td align="right">980</td>
+<td align="right">1.5</td>
+</tr>
+<tr class="even">
+<td align="left">BRIAN LIU</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1423</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="odd">
+<td align="left">JOEL R HENDON</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1436</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">FOREST ZHANG</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1348</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">KYLE WILLIAM MURPHY</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1403</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">JARED GE</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1332</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ROBERT GLEN VASEY</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1283</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="even">
+<td align="left">JUSTIN D SCHILLING</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1199</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="odd">
+<td align="left">DEREK YAN</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">1242</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="even">
+<td align="left">JACOB ALEXANDER LAVALLEY</td>
+<td align="left">MI</td>
+<td align="right">3.0</td>
+<td align="right">377</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ERIC WRIGHT</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">1362</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="even">
+<td align="left">DANIEL KHAIN</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">1382</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">MICHAEL J MARTIN</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">1291</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="even">
+<td align="left">SHIVAM JHA</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">1056</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">TEJAS AYYAGARI</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">1011</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="even">
+<td align="left">ETHAN GUO</td>
+<td align="left">MI</td>
+<td align="right">2.5</td>
+<td align="right">935</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">JOSE C YBARRA</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">1393</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="even">
+<td align="left">LARRY HODGE</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">1270</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ALEX KONG</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">1186</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="even">
+<td align="left">MARISA RICCI</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">1153</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="odd">
+<td align="left">MICHAEL LU</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">1092</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="even">
+<td align="left">VIRAJ MOHILE</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">917</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="odd">
+<td align="left">SEAN M MC CORMICK</td>
+<td align="left">MI</td>
+<td align="right">2.0</td>
+<td align="right">853</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="even">
+<td align="left">JULIA SHEN</td>
+<td align="left">MI</td>
+<td align="right">1.5</td>
+<td align="right">967</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">JEZZEL FARKAS</td>
+<td align="left">ON</td>
+<td align="right">1.5</td>
+<td align="right">955</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="even">
+<td align="left">ASHWIN BALAJI</td>
+<td align="left">MI</td>
+<td align="right">1.0</td>
+<td align="right">1530</td>
+<td align="right">2.0</td>
+</tr>
+<tr class="odd">
+<td align="left">THOMAS JOSEPH HOSMER</td>
+<td align="left">MI</td>
+<td align="right">1.0</td>
+<td align="right">1175</td>
+<td align="right">3.0</td>
+</tr>
+<tr class="even">
+<td align="left">BEN LI</td>
+<td align="left">MI</td>
+<td align="right">1.0</td>
+<td align="right">1163</td>
+<td align="right">2.0</td>
+</tr>
+</tbody>
+</table>
 <p>This output can be useful for evaluating player performance or
 further analysis in data science projects.</p>
 </div>
