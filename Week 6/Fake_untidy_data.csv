@@ -1,0 +1,88 @@
+id,,,GAD 7 Questions,GAD 7 ,gad response,PHQ 9 Questions,PHQ 9,phq response 
+,,,,,,,,
+202,consented on 5/14/2023,before intervention,how often have they been bothered by the following over the past 2 weeks?,,,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,2
+202,,,"Feeling nervous, anxious, or on edge",gad1,2,Little interest or pleasure in doing things,phq1,0
+202,,,Not being able to stop or control worrying,gad2,0,"Feeling down, depressed, or hopeless",phq2,0
+202,,,Worrying too much about different things,gad3,2,"Trouble falling or staying asleep, or sleeping too much",phq3,0
+202,,,Trouble relaxing,gad4,3,Feeling tired or having little energy,phq4,2
+202,,,Being so restless that it's hard to sit still,gad5,2,Poor appetite or overeating,phq5,3
+202,,,Becoming easily annoyed or irritable,gad6,1,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,1
+202,,,Feeling afraid as if something awful might happen,gad7,1,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,2
+202,,after intervention,how often have they been bothered by the following over the past 2 weeks?,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+202,,,"Feeling nervous, anxious, or on edge",gad1,3,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+202,,after intervention,Not being able to stop or control worrying,,2,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+202,,,Worrying too much about different things,gad3,2,Little interest or pleasure in doing things,phq1,Not at all
+202,,,Trouble relaxing,gad4,2,"Feeling down, depressed, or hopeless",phq2,Several days
+202,,,Being so restless that it's hard to sit still,gad5,3,"Trouble falling or staying asleep, or sleeping too much",phq3,0
+202,,,Becoming easily annoyed or irritable,gad6,0,Feeling tired or having little energy,phq4,0
+202,,,Feeling afraid as if something awful might happen,gad7,0,Poor appetite or overeating,phq5,2
+202,,,,,,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,0
+202,,,,,,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,Not at all
+202,,,,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+202,,,,,,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+,,,,,,,,
+207,,,,,,,,
+207,consented on 1/23/2024,before intervention,how often have they been bothered by the following over the past 2 weeks?,,,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+207,,,"Feeling nervous, anxious, or on edge",gad1,3,Little interest or pleasure in doing things,phq1,0
+207,,,Not being able to stop or control worrying,gad2,Not at all,"Feeling down, depressed, or hopeless",phq2,0
+207,,,Worrying too much about different things,gad3,2,"Trouble falling or staying asleep, or sleeping too much",phq3,0
+207,,,Trouble relaxing,gad4,3,Feeling tired or having little energy,phq4,2
+207,,,Being so restless that it's hard to sit still,gad5,3,Poor appetite or overeating,phq5,3
+207,,,Becoming easily annoyed or irritable,gad6,3,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,1
+207,,,Feeling afraid as if something awful might happen,gad7,3,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,2
+207,,after intervention,how often have they been bothered by the following over the past 2 weeks?,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+207,,,"Feeling nervous, anxious, or on edge",gad1,1,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+207,,after intervention,Not being able to stop or control worrying,,1,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+207,,,Worrying too much about different things,gad3,1,Little interest or pleasure in doing things,phq1,0
+207,,,Trouble relaxing,gad4,2,"Feeling down, depressed, or hopeless",phq2,
+207,,,Being so restless that it's hard to sit still,gad5,2,"Trouble falling or staying asleep, or sleeping too much",phq3,0
+207,,,Becoming easily annoyed or irritable,gad6,2,Feeling tired or having little energy,phq4,0
+207,,,Feeling afraid as if something awful might happen,gad7,0,Poor appetite or overeating,phq5,0
+207,,,,,,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,0
+207,,,,,,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,0
+207,,,,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+207,,,,,,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+,,,,,,,,
+211,,,,,,,,
+211,consented on 9/20/2024,before intervention,how often have they been bothered by the following over the past 2 weeks?,,,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+211,,,"Feeling nervous, anxious, or on edge",gad1,3,Little interest or pleasure in doing things,phq1,0
+211,,,Not being able to stop or control worrying,gad2,Several days,"Feeling down, depressed, or hopeless",phq2,3
+211,,,Worrying too much about different things,gad3,Several days,"Trouble falling or staying asleep, or sleeping too much",phq3,3
+211,,,Trouble relaxing,gad4,Several days,Feeling tired or having little energy,phq4,3
+211,,,Being so restless that it's hard to sit still,gad5,Several days,Poor appetite or overeating,phq5,3
+211,,,Becoming easily annoyed or irritable,gad6,3,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,1
+211,,,Feeling afraid as if something awful might happen,gad7,3,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,2
+211,,after intervention,how often have they been bothered by the following over the past 2 weeks?,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,3
+211,,,"Feeling nervous, anxious, or on edge",gad1,1,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+211,,after intervention,Not being able to stop or control worrying,,0,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+211,,,Worrying too much about different things,gad3,0,Little interest or pleasure in doing things,phq1,1
+211,,,Trouble relaxing,gad4,0,"Feeling down, depressed, or hopeless",phq2,1
+211,,,Being so restless that it's hard to sit still,gad5,1,"Trouble falling or staying asleep, or sleeping too much",phq3,2
+211,,,Becoming easily annoyed or irritable,gad5,1,Feeling tired or having little energy,phq4,3
+211,,,Feeling afraid as if something awful might happen,gad7,0,Poor appetite or overeating,phq5,1
+211,,,,,,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,1
+211,,,,,,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,3
+211,,,,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+211,,,,,,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+,,,,,,,,
+242,,,,,,,,
+242,consented on 9/20/2024,before intervention,how often have they been bothered by the following over the past 2 weeks?,,,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+242,,,"Feeling nervous, anxious, or on edge",gad1,2,Little interest or pleasure in doing things,phq1,3
+242,,,Not being able to stop or control worrying,gad2,2,"Feeling down, depressed, or hopeless",phq2,3
+242,,,Worrying too much about different things,gad3,2,"Trouble falling or staying asleep, or sleeping too much",phq3,2
+242,,,Trouble relaxing,gad4,2,Feeling tired or having little energy,phq4,2
+242,,,Being so restless that it's hard to sit still,gad5,2,Poor appetite or overeating,phq5,3
+242,,,Becoming easily annoyed or irritable,gad6,2,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,1
+242,,,Feeling afraid as if something awful might happen,gad7,2,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,1
+242,,after intervention,how often have they been bothered by the following over the past 2 weeks?,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+242,,after intervention,"Feeling nervous, anxious, or on edge",gad1,1,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
+242,,,Not being able to stop or control worrying,,0,"Over the last 2 weeks, how often have you been bothered by any of the following problems?",,
+242,,,Worrying too much about different things,gad3,1,Little interest or pleasure in doing things,phq1,0
+242,,,Trouble relaxing,gad4,0,"Feeling down, depressed, or hopeless",phq2,0
+242,,,Being so restless that it's hard to sit still,gad5,2,"Trouble falling or staying asleep, or sleeping too much",phq3,0
+242,,,Becoming easily annoyed or irritable,gad5,1,Feeling tired or having little energy,phq4,1
+242,,,Feeling afraid as if something awful might happen,gad7,2,Poor appetite or overeating,phq5,2
+242,,,,,,Feeling bad about yourself or that you are a failure or have let yourself or your family down,phq6,2
+242,,,,,,"Trouble concentrating on things, such as reading the newspaper or watching television",phq7,2
+242,,,,,,Moving or speaking so slowly that other people could have noticed. Or the opposite being so figety or restless that you have been moving around a lot more than usual,phq8,1
+242,,,,,,"Thoughts that you would be better off dead, or of hurting yourself ",phq9,0
