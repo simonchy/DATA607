@@ -1,0 +1,274 @@
+---
+title: "Project 2"
+author: "MD SIMON CHOWDHURY"
+date: "2024-10-10"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+# Required Libraries
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(httr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+```
+
+## Introduction
+In this document, we're going to work through three datasets, cleaning and analyzing them to uncover interesting insights. We'll be focusing on:
+
+Fake Untidy Data – Tidying up the messy data and seeing what trends we can find.
+World Population Data – Looking at how populations have changed over time and which countries have seen the fastest growth.
+University Returns Data – Finding out which universities offer the best bang for your buck based on post-graduation earnings.
+
+## Analysis of Three Datasets
+
+### Dataset 1: Fake Untidy Data
+
+#### Tidying the Data
+First, we'll clean up the untidy data, this report analyzes a dataset related to mental health surveys, including the General Anxiety Disorder (GAD-7) and Patient Health Questionnaire (PHQ-9). The dataset is untidy and needs cleaning before analysis.
+
+```{r}
+# Read the untidy dataset
+data <- read_csv("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/Week%206/Fake_untidy_data.csv")
+# Filter out rows with actual GAD-7 and PHQ-9 data
+
+gad_phq_data <- data %>%
+  filter(!is.na(`GAD 7 Questions`) | !is.na(`PHQ 9 Questions`))
+
+# Remove unnecessary columns and rows
+tidy_data <- gad_phq_data %>%
+  select(id, `GAD 7 Questions`, `gad response`, `PHQ 9 Questions`, `phq response`)
+
+# Fill forward the 'id' column for missing IDs
+tidy_data <- tidy_data %>%
+  fill(id)
+
+# Show the cleaned data
+head(tidy_data)
+```
+#### Analysis
+##### Separate GAD-7 and PHQ-9 Data
+
+We will now separate the GAD-7 and PHQ-9 responses for further analysis.
+
+```{r}
+# Separate GAD-7 and PHQ-9 data
+gad7_data <- tidy_data %>%
+  filter(!is.na(`GAD 7 Questions`)) %>%
+  select(id, `GAD 7 Questions`, `gad response`)
+
+phq9_data <- tidy_data %>%
+  filter(!is.na(`PHQ 9 Questions`)) %>%
+  select(id, `PHQ 9 Questions`, `phq response`)
+
+# Display the separated data
+head(gad7_data)
+head(phq9_data)
+
+
+
+```
+
+##### GAD-7 Summary Statistics
+
+Let's calculate summary statistics for the GAD-7 scores.
+
+```{r}
+# Convert responses to numeric
+gad7_data$`gad response` <- as.numeric(gad7_data$`gad response`)
+
+# Calculate mean and standard deviation for GAD-7 scores
+gad7_summary <- gad7_data %>%
+  group_by(id) %>%
+  summarise(mean_gad7 = mean(`gad response`, na.rm = TRUE),
+            sd_gad7 = sd(`gad response`, na.rm = TRUE))
+
+# Show the summary statistics
+gad7_summary
+
+```
+##### PHQ-9 Summary Statistics
+
+Similarly, we will calculate the summary statistics for the PHQ-9 scores.
+```{r}
+# Convert responses to numeric
+phq9_data$`phq response` <- as.numeric(phq9_data$`phq response`)
+
+# Calculate mean and standard deviation for PHQ-9 scores
+phq9_summary <- phq9_data %>%
+  group_by(id) %>%
+  summarise(mean_phq9 = mean(`phq response`, na.rm = TRUE),
+            sd_phq9 = sd(`phq response`, na.rm = TRUE))
+
+# Show the summary statistics
+phq9_summary
+```
+#### Visualization
+
+We will visualize the distribution of GAD-7 and PHQ-9 scores.
+```{r}
+# Plot GAD-7 scores
+ggplot(gad7_summary, aes(x = mean_gad7)) +
+  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
+  labs(title = "Distribution of GAD-7 Scores", x = "Mean GAD-7 Score", y = "Frequency")
+
+# Plot PHQ-9 scores
+ggplot(phq9_summary, aes(x = mean_phq9)) +
+  geom_histogram(binwidth = 1, fill = "red", color = "black") +
+  labs(title = "Distribution of PHQ-9 Scores", x = "Mean PHQ-9 Score", y = "Frequency")
+
+```
+
+#### Conclusion
+In this analysis, we tidied an initially untidy dataset containing GAD-7 (General Anxiety Disorder) and PHQ-9 (Patient Health Questionnaire) responses. This analysis provides an overview of the mental health status of the respondents based on their survey results. These insights can be used to identify trends in anxiety and depression levels, informing further investigation or potential interventions.
+
+
+### Dataset 2: World Population Data
+
+#### Tidying the Data
+This dataset tracks population by country across various years. To ensure the accuracy of the analysis, we'll clean the data, convert necessary columns to numeric formats, and remove missing values.
+```{r}
+# Read the world population dataset
+population_data <- read_csv("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/Week%206/world_population.csv")
+
+# Check the column names to verify how they are formatted
+colnames(population_data)
+
+# Check for missing values
+sum(is.na(population_data))
+
+# Convert relevant columns to numeric
+population_data <- population_data %>%
+  mutate_at(vars(contains("Population"), `Density (per km²)`, `Growth Rate`, `World Population Percentage`), as.numeric)
+
+# Ensure data is clean and formatted
+head(population_data)
+```
+
+#### Population Growth Analysis
+##### Overall Growth Rate by Continent
+We'll analyze how population growth varies across continents by calculating the total population and average growth rate in 2022.
+```{r}
+# Summarize population by continent for the year 2022
+population_by_continent <- population_data %>%
+  group_by(Continent) %>%
+  summarise(total_population_2022 = sum(`2022 Population`, na.rm = TRUE),
+            mean_growth_rate = mean(`Growth Rate`, na.rm = TRUE))
+
+# Show the summary
+population_by_continent
+
+
+```
+
+#### Top 10 Countries by Population Growth
+Next, identify the top 10 countries with the highest population growth rates in 2022.
+
+```{r}
+# Identify top 10 countries by growth rate
+top_growth_countries <- population_data %>%
+  arrange(desc(`Growth Rate`)) %>%
+  select(`Country/Territory`, `Growth Rate`) %>%
+  head(10)
+
+# Display the top growth countries
+top_growth_countries
+
+
+```
+
+#### Visualization
+we will visualize key aspects of population growth and density.
+
+##### Population Density Distribution
+Histogram to show the distribution of population density across countries.
+
+```{r}
+# Plot population density across countries
+ggplot(population_data, aes(x = `Density (per km²)`)) +
+  geom_histogram(binwidth = 1000, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Population Density", x = "Population Density (per km²)", y = "Number of Countries")
+
+```
+##### Population Growth vs. Density
+Scatter plot to examine the relationship between population growth rates and population density.
+
+```{r}
+# Scatter plot of growth rate vs population density
+ggplot(population_data, aes(x = `Density (per km²)`, y = `Growth Rate`)) +
+  geom_point(alpha = 0.5) +
+  labs(title = "Population Growth Rate vs. Density", x = "Population Density (per km²)", y = "Growth Rate")
+
+```
+#### Conclusion
+
+This dataset analysis provided insights into global population growth, population density distribution, and country rankings in terms of growth rates. We observed that certain continents, particularly Africa and Asia, showed the highest population growth rates, reflecting ongoing demographic expansion. The top 10 countries by population growth highlight regions experiencing rapid population increases, possibly driven by factors such as high birth rates and improving life expectancy. Population density varies significantly across countries, with some small, densely populated nations and vast countries with low population density.
+
+
+### Dataset 3: University Returns Data
+
+#### Tidying the Data
+The data, sourced from Wellcome Trust-supported publications for the 2012-2013 period, includes details like the cost of APCs, journal titles, publishers, and associated article information. Before proceeding with the analysis, we'll clean the dataset to ensure it's in a usable format. Convert the COST (£) column to numeric by removing any non-numeric characters. Handle missing values by filtering out rows without valid cost data.
+```{r}
+
+data <- read_csv("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/Week%206/University_returns_for_figshare_FINAL.csv")
+
+# Clean the COST column (convert to numeric)
+data <- data %>%
+  mutate(COST = as.numeric(gsub("[^0-9.]", "", `COST (£) charged to Wellcome (inc VAT when charged)`)))
+
+# Remove rows with missing or invalid COST
+data <- data %>%
+  filter(!is.na(COST))
+
+# Preview cleaned data
+head(data)
+
+
+```
+
+#### Data Analysis
+##### Summary Statistics
+
+Calculating summary statistics for the APC costs, including minimum, maximum, median, and mean values.
+
+```{r}
+# Summary statistics of the COST
+summary(data$COST)
+
+```
+##### Distribution of APC Costs
+To better understand the distribution of APC costs, we'll visualize the data using a histogram.
+```{r}
+# Plot cost distribution
+ggplot(data, aes(x = COST)) +
+  geom_histogram(binwidth = 100, fill = "blue", color = "black") +
+  labs(title = "Distribution of Article Costs", x = "Cost (£)", y = "Frequency")
+
+```
+##### Publisher-wise Cost Analysis
+Now we group the data by publishers to find out which publishers incurred the highest costs and what the average APC per publisher was.
+```{r}
+# Group by Publisher and summarize costs
+publisher_summary <- data %>%
+  group_by(Publisher) %>%
+  summarize(
+    total_cost = sum(COST, na.rm = TRUE),
+    avg_cost = mean(COST, na.rm = TRUE),
+    count = n()
+  ) %>%
+  arrange(desc(total_cost))
+
+# Display the summary
+print(publisher_summary)
+
+
+```
+
+#### Conclusion
+The distribution of APCs shows most APCs fall in 1- 5000£ range. The publisher Elsevier accounts for the highest total APC costs, followed by Public Library of Science. The average cost of publishing with MacMillan was the highest. These insights can help universities and funding agencies make more informed decisions about their academic publishing spend
