@@ -1,0 +1,161 @@
+---
+title: "Week 7 Assignment"
+author: "MD SIMON CHOWDHURY"
+date: "2024-10-19"
+output: html_document
+---
+
+## Introduction
+
+In this analysis, we're working with the CUNYMart inventory dataset, which has been provided as plain text. Our goal is to import this dataset and convert it into several useful formats: JSON, HTML, XML, and Parquet. We'll explore how each format can be beneficial depending on the context and discuss their pros and cons.
+
+## Step 1: Importing the Dataset from Text
+
+First things first, we need to bring the raw dataset into R. Since we've received the data as text, let's start by loading it into R as a single block of text. Here's the raw dataset:
+
+
+```{r}
+# Raw text input
+raw_text <- "
+Category,Item Name,Item ID,Brand,Price,Variation ID,Variation Details
+Electronics,Smartphone,101,TechBrand,699.99,101-A,Color: Black, Storage: 64GB
+Electronics,Smartphone,101,TechBrand,699.99,101-B,Color: White, Storage: 128GB
+Electronics,Laptop,102,CompuBrand,1099.99,102-A,Color: Silver, Storage: 256GB
+Electronics,Laptop,102,CompuBrand,1099.99,102-B,Color: Space Gray, Storage: 512GB
+Home Appliances,Refrigerator,201,HomeCool,899.99,201-A,Color: Stainless Steel, Capacity: 20 cu ft
+Home Appliances,Refrigerator,201,HomeCool,899.99,201-B,Color: White, Capacity: 18 cu ft
+Home Appliances,Washing Machine,202,CleanTech,499.99,202-A,Type: Front Load, Capacity: 4.5 cu ft
+Home Appliances,Washing Machine,202,CleanTech,499.99,202-B,Type: Top Load, Capacity: 5.0 cu ft
+Clothing,T-Shirt,301,FashionCo,19.99,301-A,Color: Blue, Size: S
+Clothing,T-Shirt,301,FashionCo,19.99,301-B,Color: Red, Size: M
+Clothing,T-Shirt,301,FashionCo,19.99,301-C,Color: Green, Size: L
+Clothing,Jeans,302,DenimWorks,49.99,302-A,Color: Dark Blue, Size: 32
+Clothing,Jeans,302,DenimWorks,49.99,302-B,Color: Light Blue, Size: 34
+Books,Fiction Novel,401,-,14.99,401-A,Format: Hardcover, Language: English
+Books,Fiction Novel,401,-,14.99,401-B,Format: Paperback, Language: Spanish
+Books,Non-Fiction Guide,402,-,24.99,402-A,Format: eBook, Language: English
+Books,Non-Fiction Guide,402,-,24.99,402-B,Format: Paperback, Language: French
+Sports Equipment,Basketball,501,SportsGear,29.99,501-A,Size: Size 7, Color: Orange
+Sports Equipment,Tennis Racket,502,RacketPro,89.99,502-A,Material: Graphite, Color: Black
+Sports Equipment,Tennis Racket,502,RacketPro,89.99,502-B,Material: Aluminum, Color: Silver
+"
+```
+
+## Step 2: Converting Text into a Data Frame
+Now that we have the text in R, the next step is to convert it into a structured data frame. A data frame is simply a table that organizes our data into rows and columns.
+
+```{r}
+# Converting raw text to a data frame
+library(readr)
+
+# Using `read_csv` to read the text as a CSV
+cunymart_data <- read_csv(raw_text)
+
+# Display the data frame
+print(cunymart_data)
+
+```
+
+At this point, we've turned the text into a clean, organized table that we can work with.
+
+## Step 3: Converting the Data to JSON
+JSON (JavaScript Object Notation) is a popular format for exchanging data between systems, especially for web applications. It's lightweight and easy for machines to parse. Let's convert our data into JSON format:
+
+```{r}
+library(jsonlite)
+# Convert to JSON format
+cunymart_json <- toJSON(cunymart_data, pretty = TRUE)
+cat(cunymart_json)
+
+```
+
+### Pros of JSON:
+
+1) Simple and readable by machines.
+2) Great for transmitting data between servers and browsers.
+
+### Cons of JSON:
+
+1) Not as human-readable as some other formats.
+2) Does not inherently enforce a schema, so data validation can be tricky.
+
+## Step 4: Converting the Data to HTML
+HTML (HyperText Markup Language) is primarily used for displaying data in web browsers. Converting the dataset to HTML allows us to easily display it as a table on a webpage:
+
+```{r}
+library(xtable)
+# Convert to HTML format
+cunymart_html <- print(xtable(cunymart_data), type = 'html')
+cat(cunymart_html)
+
+```
+
+### Pros of HTML:
+
+1) Perfect for displaying data on web pages.
+2) Easy for humans to read in a browser.
+### Cons of HTML:
+
+1) Not designed for storing large datasets.
+2) Bulky compared to other formats like JSON or Parquet.
+
+## Step 5: Converting the Data to XML
+XML (eXtensible Markup Language) is another format for structured data, often used for exchanging information between systems. It's similar to JSON but is more verbose and has strict rules for structure:
+
+```{r}
+library(XML)
+xml_doc <- newXMLDoc()
+root <- newXMLNode("inventory", doc = xml_doc)
+suppressWarnings(
+# Add rows as nodes
+for (i in 1:nrow(cunymart_data)) {
+  item_node <- newXMLNode("item", parent = root)
+  for (col in names(cunymart_data)) {
+    newXMLNode(col, cunymart_data[i, col], parent = item_node)
+  }
+})
+
+# Save XML
+cunymart_xml <- saveXML(xml_doc)
+cat(cunymart_xml)
+
+
+```
+
+### Pros of XML:
+
+1) Well-structured and highly standardized.
+2) Great for hierarchical data and data exchange.
+
+### Cons of XML:
+
+1) Very verbose, which makes files larger.
+2) Slower to parse compared to JSON.
+
+## Step 6: Converting the Data to Parquet
+Parquet is a columnar storage format often used in big data processing. It’s optimized for storing and reading large datasets efficiently:
+
+```{r}
+library(arrow)
+# Convert to Parquet format
+write_parquet(cunymart_data, "cunymart_data.parquet")
+# Reading the data back from the Parquet file
+cunymart_parquet <- read_parquet("cunymart_data.parquet")
+# Display the data
+print(cunymart_parquet)
+
+```
+
+### Pros of Parquet:
+
+1) Extremely efficient for large datasets.
+2) Faster read and write operations compared to row-based formats.
+
+### Cons of Parquet:
+
+1) Requires special libraries for handling.
+2) Not human-readable like JSON or XML.
+
+## Conclusion
+
+In this report, we took the CUNYMart inventory dataset, imported it from text, and converted it into several useful formats: JSON, HTML, XML, and Parquet. Each format serves a specific purpose, depending on whether the data is for storage, machine-to-machine communication, or display on a webpage. JSON and Parquet are more efficient for data handling, while HTML is great for human readability, and XML offers a strict structure ideal for data exchange.
