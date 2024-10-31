@@ -1,0 +1,89 @@
+---
+title: "Project 3"
+author: "Md. Simon Chowdhury, Inna Yedzinovich, Zaneta Paulusova, Md Asaduzzaman, Md. Asadul"
+date: "2024-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(tidyverse)
+
+# Set options
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading and Exploring the Data
+Let's load the dataset and take a quick look at the first few rows to understand its structure.
+```{r}
+# Load data
+data <- read_csv("https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/week%208/Cleaned_Augmented_Data_Science_Skills.csv")
+
+# Display the first few rows of the data
+head(data)
+
+```
+
+## Data Cleaning
+We’ll clean up the data by renaming columns and removing rows with missing values in skill columns.
+
+```{r}
+# Standardize column names to avoid spaces and special characters
+colnames(data) <- make.names(colnames(data))
+
+# Select only the columns with the top skills
+skills_data <- data %>%
+  select(Name..1.most.most.valuable.data.science.skill,
+         Name..2.most.most.valuable.data.science.skill,
+         Name..3.most.most.valuable.data.science.skill,
+         Name..4.most.most.valuable.data.science.skill,
+         Name..5.most.most.valuable.data.science.skill) %>%
+  pivot_longer(cols = everything(),
+               names_to = "skill_rank",
+               values_to = "skill") %>%
+  filter(!is.na(skill)) # Remove rows with NA skills
+
+# Check cleaned and reshaped data
+head(skills_data)
+
+```
+
+## Analysis: Most Valued Data Science Skills
+Let's calculate the frequency of each skill to determine which are the most valued.
+```{r}
+# Count the occurrences of each skill
+skill_counts <- skills_data %>%
+  group_by(skill) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+# Display the top skills
+head(skill_counts, 10)
+
+```
+
+## Visualization
+Finally, we visualize the most valued data science skills using a bar plot.
+```{r}
+# Plot the top 10 most valued skills
+library(ggplot2)
+
+ggplot(skill_counts[1:10, ], aes(x = reorder(skill, count), y = count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top 10 Most Valued Data Science Skills",
+       x = "Skill",
+       y = "Count") +
+  theme_minimal()
+
+```
+
+## Conclusion
+Based on our analysis, the top skills identified in the dataset are:
+```{r}
+# Display top skills as a list
+skill_counts[1:10, ]
+
+```
+
+These skills represent the most valued abilities in the data science field according to the responses provided and Resourcefulness is in top as most valued ability in the data science field.
