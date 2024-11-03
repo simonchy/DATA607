@@ -1,0 +1,83 @@
+---
+title: "Week 9 Assignment"
+author: "MD SIMON CHOWDHURY"
+date: "2024-11-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+```
+
+## Introduction
+In this assignment we will demonstrate how to fetch and analyze books data from the New York Times Books API. The list we're interested in is "Hardcover Fiction," and we will transform the JSON response into an R data frame.
+
+## Fetching Data from the API
+
+```{r}
+# Function to fetch and transform NY Times Books data
+get_nyt_books_data <- function(api_key, list_name = "hardcover-fiction") {
+  # Construct the URL
+  url <- paste0("https://api.nytimes.com/svc/books/v3/lists.json?list=", list_name, "&api-key=", api_key)
+  
+  # Make the GET request
+  response <- GET(url, accept("application/json"))
+  
+if (status_code(response) == 200) {
+  json_data <- content(response, as = "text", encoding = "UTF-8")
+  data <- fromJSON(json_data, flatten = TRUE)
+  
+  # Extract book details into a separate data frame
+books_details_df <- data$results %>%
+  mutate(book_details = map(book_details, ~ .x %>% 
+                              as.data.frame() %>% 
+                              select(title, author))) %>%
+  unnest(book_details)
+
+# Now you can select and work with columns directly
+books_summary <- books_details_df %>%
+  select(rank, title, author, weeks_on_list)
+
+print(books_summary)
+} else {
+  books_df <- NULL
+  print("Failed to fetch data from the API.")
+}
+}
+
+
+api_key <- "gYMvXAooRmMGPCBIAj8ADZAIT0pBzW97"
+books_data <- get_nyt_books_data(api_key)
+
+```
+
+## Displaying the Data
+The data fetched from the New York Times Books API has been converted into a data frame and displayed below
+
+```{r}
+
+head(books_data)
+
+```
+
+## Analysis
+Now that the data is loaded, lets perform some analysis.
+
+```{r}
+# Summarize the data
+summary(books_data)
+
+# Check unique book titles
+unique(books_data$title)
+
+```
+
+## Conclusion
+This assignment shows how to interface with an external API, parse JSON data, and transform it into an R data frame for further analysis. The data can be used for various visualizations and analyses in R.
+
