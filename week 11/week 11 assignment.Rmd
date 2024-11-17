@@ -1,0 +1,134 @@
+---
+title: "Week 11 Assignment"
+author: "MD SIMON CHOWDHURY"
+date: "2024-11-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(readxl)  # To read Excel files
+library(tidyr)   # For reshaping data
+library(dplyr)   # For data manipulation
+library(openxlsx) # To write Excel files
+```
+
+## Introduction
+
+In this analysis, we will implement the **Global Baseline Estimate** algorithm to predict movie ratings. The data is loaded from an Excel file, processed to calculate global averages, user biases, and item biases, and then used to predict missing ratings.
+
+## Steps Overview
+
+1. Load the ratings data from an Excel file.
+2. Reshape the data to a suitable format for analysis.
+3. Compute the global average rating.
+4. Calculate user and movie-specific biases.
+5. Predict missing ratings using the formula:  
+   \[
+   P_{u,i} = \mu + b_u + b_i
+   \]  
+   Where:
+   - \(\mu\): Global average rating.
+   - \(b_u\): User bias.
+   - \(b_i\): Item (movie) bias.
+
+## Import the Ratings Data
+We will read the ratings data from the movie_ratings.xlsx file.
+
+```{r}
+# Specify url
+url <- "https://raw.githubusercontent.com/simonchy/DATA607/refs/heads/main/week%2011/MovieRatings.xlsx"
+
+# Create a temporary file path
+temp_file <- tempfile(fileext = ".xlsx")
+
+# Download the file to the temporary location
+download.file(url, destfile = temp_file, mode = "wb")
+
+# Read the Excel file
+ratings <- read_excel(temp_file)
+
+# Display the imported data
+print(ratings)
+
+```
+
+## Reshape the Data
+To make calculations easier, we'll transform the data into a long format.
+
+```{r}
+# Reshape the data into a long format
+ratings_long <- ratings %>%
+  pivot_longer(-Critic, names_to = "Movie", values_to = "Rating") %>%
+  drop_na()
+
+# Display the reshaped data
+head(ratings_long)
+
+```
+
+## Calculate Global Baseline
+
+### Global Average (μ)
+First, we calculate the global average rating across all critics and movies.
+
+```{r}
+global_mean <- mean(ratings_long$Rating)
+cat("Global Average (µ):", global_mean, "\n")
+```
+
+### User Bias \( b_u \)
+Next, we calculate how much each user's ratings deviate from the global average.
+
+```{r}
+user_bias <- ratings_long %>%
+  group_by(Critic) %>%
+  summarize(b_u = mean(Rating) - global_mean)
+
+# Display user biases
+print(user_bias)
+
+```
+
+### Item Bias (b_i)
+We also calculate how much each movie's ratings deviate from the global average.
+
+```{r}
+item_bias <- ratings_long %>%
+  group_by(Movie) %>%
+  summarize(b_i = mean(Rating) - global_mean)
+
+# Display item biases
+print(item_bias)
+
+```
+
+## Predict Missing Ratings
+Using the global average, user bias, and item bias, we compute predicted ratings.
+
+```{r}
+# Merge biases with the original data
+ratings_with_bias <- ratings_long %>%
+  left_join(user_bias, by = "Critic") %>%
+  left_join(item_bias, by = "Movie") %>%
+  mutate(Prediction = global_mean + b_u + b_i)
+
+# Display predictions
+print(ratings_with_bias)
+
+```
+
+## Save the Results
+The predictions are saved into a new Excel file named results_ratings.xlsx.
+
+```{r}
+# Save predictions to Excel
+output_file <- "results_ratings.xlsx"
+write.xlsx(ratings_with_bias, output_file, append= FALSE)
+
+cat("Predictions saved to:", output_file, "\n")
+
+```
+
+
+## Conclusion
+This analysis implemented the Global Baseline Estimate algorithm to predict missing ratings.
