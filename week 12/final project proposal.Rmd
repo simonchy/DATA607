@@ -1,0 +1,10 @@
+---
+title: "Project Proposal"
+author: "MD Asadul Islam & Md Simon Chowdhury"
+date: "2024-11-18"
+output: html_document
+---
+
+## Analyzing Traffic Patterns and Predicting Congestion in Urban Areas
+
+Urban traffic congestion has been a nuance for many travelers for a long time. Understanding and predicting the traffic patters can help the policymakers and the travel planners to come up with strategies that can mitigate congestion, improve the road network, and lead to a better transportation system. Therefore, this project aims to analyze historic traffic data to determine times of the day when there is traffic congestion and in which areas does congestion last the most. The data will be found in Kaggle or Us Department of Transportation based on sensors installed on roads. The data will be obtained from the said sites, then cleaned, explored and then analyzed to reveal patterns. 
