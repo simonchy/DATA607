@@ -1,0 +1,194 @@
+---
+title: "Analyzing Traffic Patterns and Predicting Congestion"
+author: "MD Asadul Islam & Md Simon Chowdhury"
+date: "`r Sys.Date()`"
+output: slidy_presentation
+---
+
+# Introduction
+
+- **Urban Traffic Congestion**:
+  - Major issue in NYC affecting travel efficiency and quality of life.
+  - Project goals:
+    1. Analyze traffic data for patterns.
+    2. Predict congestion hotspots.
+    3. Offer actionable insights for mitigation.
+
+- **Dataset Overview**:
+  - Fields: `RequestID`, `Boro`, `Vol`, `Direction`, `WktGeom`.
+  - Focus on identifying:
+    - Peak traffic times.
+    - High-traffic boroughs.
+    - Specific congestion hotspots.
+
+---
+
+# Data Preparation
+
+### Required Libraries
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)  # Data manipulation
+library(lubridate)  # Date handling
+library(ggplot2)    # Visualization
+library(sf)         # Geospatial data
+library(DT)         # Interactive tables
+```
+
+### Loading and Inspecting Data
+
+```{r load_data, echo=FALSE}
+traffic_data <- read.csv("C:/Users/unnia/Downloads/DAta607/final project/Automated_Traffic_Volume_Counts_20241207.csv")
+head(traffic_data)
+str(traffic_data)
+```
+
+**Initial Observations**:
+- Rows: `r nrow(traffic_data)`
+- Columns: `r ncol(traffic_data)`
+
+---
+
+# Data Cleaning
+
+### Key Steps
+
+```{r cleaning_steps}
+traffic_data <- traffic_data %>%
+  mutate(
+    Date = make_date(Yr, M, D),
+    Time = sprintf("%02d:%02d:%02d", HH, MM, 0),
+    DateTime = as.POSIXct(paste(Date, Time), format="%Y-%m-%d %H:%M:%S")
+  ) %>%
+  filter(Vol >= 0) %>%
+  distinct()
+
+# Check for missing values in each column
+missing_values <- colSums(is.na(traffic_data))
+
+traffic_data$Vol[traffic_data$Vol < 0] <- NA
+traffic_data$Vol[is.na(traffic_data$Vol)] <- median(traffic_data$Vol, na.rm = TRUE)
+
+```
+
+- **Negative Volumes** replaced with `NA`.
+- **Duplicates Removed**.
+- **Date-Time Combined** for temporal analysis.
+
+```{r cleaned_preview, echo=FALSE}
+library(DT)
+datatable(head(traffic_data))
+```
+
+---
+
+# Exploratory Data Analysis
+
+## Traffic Volume Trends
+
+### Volume Over Time
+
+```{r volume_over_time}
+time_volume <- traffic_data %>%
+  group_by(DateTime) %>%
+  summarise(Total_Vol = sum(Vol))
+
+ggplot(time_volume, aes(x = DateTime, y = Total_Vol)) +
+  geom_line(color = "blue", size = 1) +
+  labs(
+    title = "Traffic Volume Over Time",
+    x = "Time",
+    y = "Volume"
+  ) +
+  theme_minimal()
+```
+
+---
+
+## Traffic Volume by Borough
+
+```{r volume_by_borough}
+borough_volume <- traffic_data %>%
+  group_by(Boro) %>%
+  summarise(Total_Vol = sum(Vol))
+
+ggplot(borough_volume, aes(x = Boro, y = Total_Vol, fill = Boro)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Total_Vol), vjust = -0.5) +
+  labs(
+    title = "Traffic Volume by Borough",
+    x = "Borough",
+    y = "Volume"
+  ) +
+  theme_minimal()
+```
+
+---
+
+# Focus on Congestion Hotspots
+
+## Pulaski Bridge Case Study
+
+```{r pulaski_bridge}
+station_data <- traffic_data %>%
+  filter(street == "PULASKI BRIDGE") %>%
+  mutate(Hour = HH) %>%
+  group_by(Hour) %>%
+  summarise(Average_Volume = mean(Vol, na.rm = TRUE))
+
+ggplot(station_data, aes(x = Hour, y = Average_Volume)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "red", size = 2) +
+  labs(
+    title = "Hourly Traffic Volume at Pulaski Bridge",
+    x = "Hour of the Day",
+    y = "Average Traffic Volume"
+  ) +
+  theme_minimal()
+```
+
+---
+
+## Interactive Hotspot Map
+
+```{r interactive_map}
+# Filter data for valid WKT geometries
+traffic_data <- traffic_data %>% filter(!is.na(WktGeom))
+traffic_data <- traffic_data %>% filter(grepl("^POINT\\s\\(.+\\)$", WktGeom))
+
+# Convert to spatial data
+traffic_sf <- st_as_sf(traffic_data, wkt = "WktGeom", crs = 4326)
+
+# Fix invalid geometries
+traffic_sf <- traffic_sf %>% st_make_valid()
+
+# Plot congestion hotspots
+ggplot(data = traffic_sf) +
+  geom_sf(aes(color = Vol)) +
+  labs(
+    title = "Congestion Hotspots",
+    color = "Volume"
+  ) +
+  theme_minimal()
+```
+
+---
+
+# Key Insights
+
+- **High-Traffic Boroughs**: 
+  - `r borough_volume$Boro[which.max(borough_volume$Total_Vol)]` shows the highest traffic volume.
+- **Peak Congestion Hours**: Evening rush hours (4–7 PM) show the highest volumes.
+- **Hotspots Identified**: Pulaski Bridge and other key streets observed.
+
+---
+
+# Conclusion
+
+- In conclusion, our analysis highlights peak congestion hours, high-traffic boroughs, and significant hotspots. Integrating external factors like weather and special events could enhance this study. These findings provide actionable insights for policymakers and urban planners
+- **Future Directions**:
+  1. Integrate weather or event data.
+  2. Build predictive models to forecast congestion.
+  3. Optimize traffic management strategies based on insights.
+
+---
