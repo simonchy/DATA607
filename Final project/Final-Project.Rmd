@@ -7,7 +7,7 @@ output: html_document
 
 ## Introduction
 
-Urban traffic congestion negatively impacts travel efficiency and quality of life. This project analyzes traffic data for New York City (NYC) to understand traffic patterns, predict congestion, and provide actionable insights for mitigation strategies.
+Urban traffic congestion negatively impacts travel efficiency and quality of life. This project analyzes traffic data for New York City (NYC) to understand traffic patterns, predict congestion, and provide actionable insights for mitigation strategies.The data was collected from NYC OpenData source https://opendata.cityofnewyork.us/.
 
 The dataset contains traffic data, including fields such as `RequestID`, `Boro`, `Vol`, `Direction`, and `WktGeom`. The goal is to identify congestion patterns across time and locations, focusing on peak times, high-traffic boroughs, and specific hotspots.
 
